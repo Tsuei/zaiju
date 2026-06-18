@@ -1,0 +1,362 @@
+// =====================================================================
+// 文言陰符 · 全局样式
+// 配色：黑底 + 朱字 —— 仿 book.wy-lang.org
+// =====================================================================
+
+// -------------------- 配色变量 --------------------
+:root {
+  --bg:        #1a0d08;   // 主背景：深褐黑
+  --bg-2:      #2a1810;   // 略浅：用于代码块、引用块
+  --bg-3:      #0f0805;   // 边角阴影
+
+  --ink:       #c8403a;   // 朱砂红：主文字
+  --ink-bright:#e85a52;   // 高亮朱：标题、激活态
+  --ink-soft:  #8a2a26;   // 暗朱：辅助文字
+  --gold:      #b08a3e;   // 描金（点缀）
+
+  --line:      rgba(200, 64, 58, 0.35);
+  --line-soft: rgba(200, 64, 58, 0.15);
+}
+
+// -------------------- 基础重置 --------------------
+* { box-sizing: border-box; border-radius: 0 !important; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg) !important;
+  color: var(--ink) !important;
+  font-family: 'STKaiti', 'KaiTi', 'Noto Serif SC', 'Source Han Serif SC',
+               'STSong', 'SimSun', serif !important;
+  letter-spacing: 0.05em;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app { height: 100%; }
+
+// -------------------- 顶部链接行 --------------------
+.yinfu-topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  font-family: 'Courier New', 'Menlo', monospace;
+  font-size: 13px;
+  height: 38px;
+
+  .topbar-inner {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 24px;
+    gap: 8px;
+    color: var(--ink-soft);
+
+    .brand {
+      color: var(--ink-bright);
+      font-weight: bold;
+      letter-spacing: 0.2em;
+    }
+    .subtitle { color: var(--ink-soft); }
+    .sep     { color: var(--ink-soft); opacity: 0.5; padding: 0 4px; }
+    .spacer  { flex: 1; }
+
+    a {
+      color: var(--ink);
+      text-decoration: none;
+      border: none !important;
+      transition: color 0.2s;
+      &:hover { color: var(--ink-bright); }
+    }
+  }
+}
+
+// -------------------- 章节 tab --------------------
+.yinfu-tabs {
+  position: fixed;
+  top: 38px;
+  left: 0; right: 0;
+  z-index: 99;
+  display: flex;
+  gap: 0;
+  padding: 0 24px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  overflow-x: auto;
+  height: 56px;
+  align-items: stretch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  .tab {
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    font-family: 'STKaiti', 'KaiTi', serif;
+    font-size: 18px;
+    letter-spacing: 0.3em;
+    border: none !important;
+    border-bottom: 3px solid transparent !important;
+    white-space: nowrap;
+    transition: all 0.25s;
+    user-select: none;
+    &:hover {
+      color: var(--ink);
+      background: rgba(200, 64, 58, 0.05);
+    }
+    &.active {
+      color: var(--ink-bright);
+      border-bottom-color: var(--ink-bright) !important;
+    }
+  }
+}
+
+// -------------------- 主体滚动区 --------------------
+.yinfu-body {
+  position: fixed;
+  top: 94px;     // 38 (topbar) + 56 (tabs)
+  left: 0; right: 0;
+  bottom: 56px;  // footer
+  overflow-x: auto;
+  overflow-y: hidden;
+  background:
+    radial-gradient(ellipse at center, var(--bg) 0%, var(--bg-3) 100%);
+}
+
+.yinfu-scroll {
+  min-width: 100%;
+  height: 100%;
+  padding: 32px 0;
+
+  &.mode-vertical {
+    writing-mode: vertical-rl;
+    -webkit-writing-mode: vertical-rl;
+    text-orientation: upright;
+  }
+}
+
+.yinfu-page {
+  display: inline-block;
+  padding: 0 80px;
+  min-height: 100%;
+  font-size: 20px;
+  line-height: 2.2;
+
+  // 竖排模式下的微调
+  .mode-vertical & {
+    font-size: 22px;
+    line-height: 2.4;
+  }
+}
+
+// -------------------- 底部 --------------------
+.yinfu-footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 100;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 0 24px;
+  background: var(--bg);
+  border-top: 1px solid var(--line);
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  color: var(--ink-soft);
+
+  .footer-hint { flex: 0 0 auto; }
+
+  input[type="range"] {
+    flex: 1;
+    height: 4px;
+    background: var(--ink-soft);
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+
+    &::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      background: var(--ink-bright);
+      cursor: pointer;
+    }
+    &::-moz-range-thumb {
+      width: 14px;
+      height: 14px;
+      background: var(--ink-bright);
+      border: none;
+      cursor: pointer;
+    }
+  }
+
+  .page-indicator {
+    flex: 0 0 auto;
+    letter-spacing: 0.15em;
+    color: var(--ink);
+  }
+}
+
+// -------------------- 默认主题内容覆盖 --------------------
+.theme-default-content,
+.content {
+  background: transparent !important;
+  color: var(--ink) !important;
+  max-width: none !important;
+  padding: 0 !important;
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--ink-bright) !important;
+    border: none !important;
+    font-family: 'STKaiti', 'KaiTi', serif !important;
+    letter-spacing: 0.3em;
+    margin: 0 0 1em 0;
+    font-weight: normal;
+  }
+  h1 { font-size: 2em;    }
+  h2 { font-size: 1.6em;  }
+  h3 { font-size: 1.3em;  }
+
+  p {
+    margin: 0 0 1em 0;
+    text-indent: 2em;
+  }
+
+  // 竖排模式下 p 用右侧 margin（中文竖排间距）
+  .mode-vertical & p {
+    margin: 0 1.5em 0 0;
+    text-indent: 2em;
+  }
+
+  a {
+    color: var(--ink-bright) !important;
+    text-decoration: none;
+    border-bottom: 1px dotted var(--ink-soft);
+    transition: all 0.2s;
+    &:hover {
+      color: var(--ink-bright) !important;
+      border-bottom-color: var(--ink-bright);
+      background: rgba(200, 64, 58, 0.1);
+    }
+  }
+
+  strong { color: var(--ink-bright); font-weight: normal; }
+  em     { color: var(--gold);        font-style: normal; }
+
+  code, pre {
+    font-family: 'FangSong', 'STFangsong', 'Courier New', monospace !important;
+    background: var(--bg-2) !important;
+    color: var(--ink-bright) !important;
+    border: 1px solid var(--line);
+    padding: 0.2em 0.6em;
+  }
+  pre {
+    padding: 1em;
+    overflow-x: auto;
+    line-height: 1.6;
+    code { padding: 0; border: none; background: transparent !important; }
+  }
+
+  blockquote {
+    border-left: 3px solid var(--ink) !important;
+    background: var(--bg-2) !important;
+    padding: 0.8em 1.2em;
+    margin: 1em 0;
+    font-style: normal;
+    color: var(--ink);
+    &::before {
+      content: '「';
+      color: var(--ink-bright);
+      margin-right: 0.3em;
+    }
+    &::after {
+      content: '」';
+      color: var(--ink-bright);
+      margin-left: 0.3em;
+    }
+  }
+
+  ul, ol {
+    padding-left: 2em;
+    li { margin: 0.3em 0; }
+  }
+
+  table {
+    border-collapse: collapse;
+    margin: 1em 0;
+    th, td {
+      border: 1px solid var(--line);
+      padding: 0.4em 0.8em;
+    }
+    th { background: var(--bg-2); color: var(--ink-bright); }
+  }
+
+  hr {
+    border: none;
+    border-top: 1px dashed var(--line);
+    margin: 2em 0;
+  }
+
+  img {
+    max-width: 100%;
+    border: 1px solid var(--line);
+    filter: sepia(0.3) hue-rotate(-20deg);
+  }
+}
+
+// -------------------- 隐藏默认主题元素 --------------------
+.navbar,
+.sidebar,
+.sidebar-toggle,
+.page-nav,
+.breadcrumb,
+.pagination,
+.home {
+  display: none !important;
+}
+
+// -------------------- 滚动条样式 --------------------
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-3);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-soft);
+  &:hover { background: var(--ink); }
+}
+::-webkit-scrollbar-corner {
+  background: var(--bg);
+}
+
+// -------------------- 响应式 --------------------
+@media (max-width: 768px) {
+  .yinfu-topbar {
+    .topbar-inner {
+      padding: 0 12px;
+      font-size: 11px;
+      .subtitle { display: none; }
+    }
+  }
+  .yinfu-tabs {
+    padding: 0 8px;
+    .tab { padding: 0 16px; font-size: 15px; }
+  }
+  .yinfu-page { padding: 0 32px; font-size: 17px; }
+  .yinfu-footer {
+    padding: 0 12px;
+    gap: 12px;
+    .footer-hint { display: none; }
+  }
+}
