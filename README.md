@@ -7,7 +7,7 @@
 ```
 node index.js
 ```
-更新`site\index.html`
+更新`site/index.html`
 
 
 

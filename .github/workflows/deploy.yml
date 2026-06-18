@@ -31,6 +31,9 @@ jobs:
         working-directory: ./scripts
         run: pnpm install --frozen-lockfile
 
+      - name: Ensure site directory exists
+        run: mkdir -p site
+
       - name: Build Book
         working-directory: ./scripts
         run: node index.js
