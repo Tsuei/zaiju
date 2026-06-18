@@ -39,17 +39,15 @@ jobs:
         run: node index.js
 
       - name: Verify build output
-        working-directory: ./scripts
-        run: ls -la site  # 调试用，跑通后可删
+        run: ls -la site
 
       - name: Create CNAME
-        working-directory: ./scripts
         run: echo "book.ektropia.top" > site/CNAME
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./scripts/site   # 关键：和构建输出对齐
+          publish_dir: ./site          # ← 关键：仓库根
           publish_branch: gh-pages
           force_orphan: true
