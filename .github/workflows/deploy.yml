@@ -22,14 +22,25 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v3
+      # Node 20 是当前 Actions 上能稳定用、且 VuePress 1.9.9 + sass-loader 13 兼容的最后一个 LTS。
+      # Node 16 已被 GitHub Actions runners 移除（2025 年起）。
+      # Node 24 默认是 runner 的 Node，但 sass-loader 13 在 Node 24 下大概率挂。
+      - name: Allow Node 20
+        env:
+          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+        run: echo "ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=$ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION" >> $GITHUB_ENV
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: 16
-          cache: npm
+          node-version: 20
 
-      - run: npm ci
+      # 用 npm install 而不是 npm ci —— 兼容"没有 lock 文件"的情况。
+      # 推荐：本地跑一次 `npm install`，把生成的 package-lock.json 一并提交，可提速并保证可复现。
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
 
-      - run: npm run build
+      - name: Build
+        run: npm run build
 
       - uses: actions/configure-pages@v4
 
