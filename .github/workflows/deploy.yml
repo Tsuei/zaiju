@@ -1,59 +1,52 @@
-name: Deploy Book
+name: Build and Deploy Book
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches:
+      - main
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
         with:
-          fetch-depth: 0
+          version: 10
 
-      # VuePress 1.9.9 内部的 vue-server-renderer@4.5.0 依赖 webpack 4 + tapable 1.x
-      # Node 18+ 装出来的 tapable 是 2.x，hook API 变了会触发：
-      #   "TypeError: Cannot read properties of undefined (reading 'tapAsync')"
-      # Node 16 是 VP1 官方测试过的环境，setup-node v4 加 ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=true 仍可装。
-      - name: Allow Node 16
-        env:
-          ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
-        run: echo "ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION=$ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION" >> $GITHUB_ENV
-
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 16
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: scripts/pnpm-lock.yaml
 
-      # 用 npm install 而不是 npm ci（兼容无 lock）。本地有 lock 时也走得很快。
       - name: Install dependencies
-        run: npm install --no-audit --no-fund --legacy-peer-deps
+        working-directory: ./scripts
+        run: pnpm install --frozen-lockfile
 
-      - name: Build
-        run: npm run build
+      - name: Build Book
+        working-directory: ./scripts
+        run: node index.js
 
-      - uses: actions/configure-pages@v4
+      - name: Verify build output
+        working-directory: ./scripts
+        run: ls -la site  # 调试用，跑通后可删
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Create CNAME
+        working-directory: ./scripts
+        run: echo "book.ektropia.top" > site/CNAME
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
         with:
-          path: docs/.vuepress/dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./scripts/site   # 关键：和构建输出对齐
+          publish_branch: gh-pages
+          force_orphan: true

@@ -1,0 +1,30 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      '@wenyanlang/core':
+        specifier: ^0.3.2
+        version: 0.3.2
+
+packages:
+
+  '@wenyanlang/core@0.3.2':
+    resolution: {integrity: sha512-C08jagvmq2vvGS8sOtBTb+AIQ9rVw4s4J++bEmzfFIMpb+7voJ62O0YUAf2SouBViPDgmc7ZWq1v5nayfwI7Sw==}
+
+  xmlhttprequest@1.8.0:
+    resolution: {integrity: sha512-58Im/U0mlVBLM38NdZjHyhuMtCqa61469k2YP/AaPbvCoV9aQGUpbJBj1QRm2ytRiVQBD/fsw7L2bJGDVQswBA==}
+    engines: {node: '>=0.4.0'}
+
+snapshots:
+
+  '@wenyanlang/core@0.3.2':
+    dependencies:
+      xmlhttprequest: 1.8.0
+
+  xmlhttprequest@1.8.0: {}
