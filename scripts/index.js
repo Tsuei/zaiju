@@ -144,7 +144,7 @@ function matrix(bl,sem,H){
 			}else if (t == "#"){
 				// w = 2;
 				A.push(x)
-				// x -= 1;
+				x -= 1;
 			}else if (t == "-"){
 				ind = 2;
 				T.push({t:"一",s,x,y})
@@ -338,7 +338,7 @@ function main(){
 		}
 
 		var _h = (_ra.offsetHeight-2);
-		var _t = 204;
+		var _t = 174; // cover元素的top值，_t px，原204
 
 		var cov = document.getElementById("cover");
 		cov.style.position = "absolute"
@@ -589,8 +589,8 @@ var html = `
 <!--GENERATED FILE DO NOT EDIT-->
 <head>
   <meta charset="UTF-8">
-  <meta name="description" content="An Introduction to Programming in Wenyan Language">
-  <title>wenyan-book</title>
+  <meta name="description" content="A book of poems">
+  <title>Zaiju Collection</title>
 </head>
 <script src="https://code.iconify.design/1/1.0.4/iconify.min.js"></script>
 <style id="style">
@@ -637,7 +637,7 @@ body{
 }
 .ql{
 	position:absolute;
-	border-top: 2px solid ${RED}; /* 原为1.5px */
+	border-top: 2px solid ${RED}; /* 定制引号的颜色，原为1.5px，下同 */
 	border-right: 2px solid ${RED};
 	transform: translate(-2px,5px);
 	color:rgba(0,0,0,0);
@@ -682,7 +682,7 @@ body{
 
 #render{
 	position:absolute;
-	top:180px;
+	top:150px; /* 正文上边距，原为180px */
 	left:0px;
 	height:calc(100% - 200px);
 	width:100%;
@@ -758,7 +758,7 @@ body{
 #toc{
 	position:absolute;
 	right:0px;
-	top:90px;
+	top:60px; /* 导航栏上边距，原为90 */
 	width:100%;
 	height:90px;
 	overflow:hidden;
@@ -854,37 +854,49 @@ a:active{
 
 <div id="title">
 <h1>在莒集 / Zaiju Collection</h1>
-
+<!--
+<h2>An Introduction to Programming in Wenyan Language / 文言文編程入門</h2>
+<a href="https://github.com/wenyan-lang/book/releases">pdf</a> | <a href="https://github.com/wenyan-lang/book">github</a> | <a href="https://wy-lang.org/">wenyan-lang</a> | <a href="https://github.com/wenyan-lang/wenyan/wiki">wiki</a> | <a href="https://lingdong.works/">lingdong</a>
+<br>
+-->
 <span class="text-btn" onclick="document.documentElement.style.filter=document.documentElement.style.filter.length?'':'invert(95%)';this.innerHTML={'[light]':'[dark]','[dark]':'[light]'}[this.innerHTML]">[dark]</span>
-
+<!--
+<span class="text-btn" onclick="document.getElementById('help').style.display={'block':'none','none':'block'}[document.getElementById('help').style.display];">[help]</span>
+-->
 </div>
+<!--
 <div style="position:absolute;left:20px;top:15px;opacity:0.5">${fs.readFileSync("../assets/wy-logo.svg").toString().replace(/<g>[^]*?<\/g>/,"")}</div>
+-->
 <div id="render"></div>
 <div id="cover">
+	<!--
 	<div style="position:absolute;left:72px;width:calc(100% - 144px);top:0px;height:100%;border-left:2px solid ${BLACK};border-right:2px solid ${BLACK}">
 		${fs.readFileSync("../assets/title-alt.svg").toString().replace("<svg ",`<svg style="height:85%;width:100%;position:absolute;top:5%;"`)}
 	</div>
-	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*0}px">文</div>
-	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*1}px">言</div>
-	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*2}px">語</div>
-	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*3}px">言</div>
-	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*4}px">編</div>
-	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*5}px">程</div>
-	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*6}px">入</div>
-	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*7}px">門</div>
+	-->
+	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*0}px"></div>
+	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*1}px"></div>
+	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*2}px"></div>
+	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*3}px"></div>
+	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*4}px"></div>
+	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*5}px"></div>
+	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*6}px"></div>
+	<div style="position:absolute; font-size:${tw}px; right:20px; top:${10+tw*7}px"></div>
 
 
-	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 122px)">庚</div>
-	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 94px)">子</div>
-	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 66px)">年</div>
-	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 38px)">春</div>
+	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 122px)"></div>
+	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 94px)">秋</div>
+	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 66px)">水</div>
+	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 38px)">观</div>
 
-	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 122px)">黃</div>
-	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 94px)">令</div>
-	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 66px)">東</div>
-	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 38px)">編</div>
+	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 122px)"></div>
+	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 94px)">齐</div>
+	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 66px)">拓</div>
+	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 38px)">撰</div>
 
+	<!--
 	${fs.readFileSync("../assets/exlibris.svg").toString().replace("<svg ",`<svg style="position:absolute;left:-9px;bottom:10px;height:80px;"`)}
+	-->
 </div>
 <div id="slider"></div>
 <div id="editor-wrap" style="left:-1000px;">
