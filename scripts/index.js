@@ -5,6 +5,7 @@ QL1 = "「"
 QR1 = "」"
 
 PRD = "。"
+COM = "，";
 RED = "#BB705AEE";
 BLACK = "#2B2B2B";
 BLUE = "#357";
@@ -59,7 +60,7 @@ for (var i = 0; i < ftexts.length; i++){
 	ftexts[i] = ftexts[i].replace(/  /g,"　").replace(/\t/g,"　")//U+3000 ideograph sapce
 }
 var txt = ftexts.join("\n");
-txt = "文言陰符內篇\n　　"+fnames.map((x,i)=>x.split(" ")[1].split(".")[0]+(i%2==1?"\n　":(i>=10?"":"　"))).join("　")+"\n"+txt;
+txt = "在莒集\n　　"+fnames.map((x,i)=>x.split(" ")[1].split(".")[0]+(i%2==1?"\n　":(i>=10?"":"　"))).join("　")+"\n"+txt;
 
 ICONS.CHAPTERS = []
 for (var i = 0; i < fnames.length; i++){
@@ -124,7 +125,7 @@ function matrix(bl,sem,H){
 				}else{
 					T.push({t,s,x:x,y:y-w})
 				}
-			}else if (t == PRD){
+			}else if (t == PRD || t == COM){
 				if (y == 0){
 					T.push({t,s,x:x+w,y:H-w})
 				}else{
@@ -137,14 +138,23 @@ function matrix(bl,sem,H){
 					w = 1
 				}
 				ind = 0;
+			}else if (t == "〇"){ // 以下〇 > /是自己改的主题，分别为缩进2、3、4字距块
+				ind = 2;
+				y += w*2;
 			}else if (t == "#"){
-				w = 2;
+				// w = 2;
 				A.push(x)
-				x -= 1;
+				// x -= 1;
 			}else if (t == "-"){
 				ind = 2;
 				T.push({t:"一",s,x,y})
 				y += w*2;
+			}else if (t == ">"){
+				ind = 3;
+				y += w*3;
+			}else if (t == "/"){
+				ind = 4;
+				y += w*4;
 			}else{
 				T.push({t,s,x,y})
 				y += w;
@@ -166,7 +176,7 @@ function typeset(T,F,l,r,w,h){
 	var ymax = 0;
 	for (var i = 0; i < T.length; i++){
 		var f = parseInt(T[i].s) || 1;
-		var ff = 1.1
+		var ff = 1.1 // 字号，原为1.1
 		var x = T[i].x*w-w*f;
 		var t = T[i].t;
 		var cstr = "";
@@ -191,6 +201,14 @@ function typeset(T,F,l,r,w,h){
 				O += `<div class="qr" style="top:${oy+h/2}px; left:${ox-d}px; width:${h/2+d}px; height:${h/2+d}px;">」</div>`
 			}else if (t == PRD){
 				O += `<div class="punc" style="top:${oy+h/2}px; left:${ox+h/2}px; font-size:${h*f*ff}px; ${(cstr.length)?cstr:"color:"+RED};">${t}</div>`
+			}else if (t == COM){
+    			O += `<div class="punc"
+        		style="
+            		top:${oy+h/2}px;
+            		left:${ox+h/2}px;
+            		font-size:${h*f*ff}px;
+           			${(cstr.length)?cstr:"color:"+RED};
+        		">、</div>`
 			}else{
 				var iso = (t=="〇");
 				O += `<div class="text" style="top:${oy+(f>1?h/2:0)}px; left:${ox+iso*h*0.15}px; font-size:${h*f*(iso?0.8:ff)}px; ${cstr}">${t}</div>`
@@ -250,8 +268,8 @@ function typeset(T,F,l,r,w,h){
 
 
 function main(){
-	var w = 36;
-	var h = 28;
+	var w = 60; // 36
+	var h = 42; // 28
 	var R = document.getElementById("render");
 	var S = document.getElementById("slider")
 	var M;
@@ -401,7 +419,7 @@ function main(){
 
 		if (i != -1){
 			var t = fnames[i].split(" ")[1].split(".")[0];
-			var s = "文言陰符內篇卷"+t.split("第")[1];
+			var s = "在莒集卷之"+t.split("第")[1];
 			for (var j = 0; j < s.length; j++){
 				o += `<div style="position:absolute; font-size:20px; left:1px; top:${60+j*20}px">${s[j]}</div>`
 			}
@@ -578,9 +596,16 @@ var html = `
 <style id="style">
 @font-face {
 	font-family: QIJI;
+	src:
+		url('./qiji-combo.woff2') format('woff2');
+}
+/*
+@font-face {
+	font-family: QIJI;
 	font-display: swap;
 	src: url('https://cdn.jsdelivr.net/gh/wenyan-lang/book@3899aad7a917d0f000716ca97fe29221fe4b56d6/assets/font.woff2') format('woff2'), url('https://cdn.jsdelivr.net/gh/wenyan-lang/book@3899aad7a917d0f000716ca97fe29221fe4b56d6/assets/font.ttf') format('truetype');
 }
+*/
 :root{
 	background:white;
 	overflow:hidden;
@@ -612,15 +637,15 @@ body{
 }
 .ql{
 	position:absolute;
-	border-top: 1.5px solid ${RED};
-	border-right: 1.5px solid ${RED};
+	border-top: 2px solid ${RED}; /* 原为1.5px */
+	border-right: 2px solid ${RED};
 	transform: translate(-2px,5px);
 	color:rgba(0,0,0,0);
 }
 .qr{
 	position:absolute;
-	border-bottom: 1.5px solid ${RED};
-	border-left: 1.5px solid ${RED};
+	border-bottom: 2px solid ${RED};
+	border-left: 2px solid ${RED};
 	transform: translate(2px,4.5px);
 	color:rgba(0,0,0,0);
 }
@@ -828,12 +853,10 @@ a:active{
 <body><div id="body" style="position:absolute;left:0px;right:0px;top:0px;bottom:0px">
 
 <div id="title">
-<h1>wenyan-book / 文言陰符</h1>
-<h2>An Introduction to Programming in Wenyan Language / 文言文編程入門</h2>
-<a href="https://github.com/wenyan-lang/book/releases">pdf</a> | <a href="https://github.com/wenyan-lang/book">github</a> | <a href="https://wy-lang.org/">wenyan-lang</a> | <a href="https://github.com/wenyan-lang/wenyan/wiki">wiki</a> | <a href="https://lingdong.works/">lingdong</a>
-<br>
+<h1>在莒集 / Zaiju Collection</h1>
+
 <span class="text-btn" onclick="document.documentElement.style.filter=document.documentElement.style.filter.length?'':'invert(95%)';this.innerHTML={'[light]':'[dark]','[dark]':'[light]'}[this.innerHTML]">[dark]</span>
-<span class="text-btn" onclick="document.getElementById('help').style.display={'block':'none','none':'block'}[document.getElementById('help').style.display];">[help]</span>
+
 </div>
 <div style="position:absolute;left:20px;top:15px;opacity:0.5">${fs.readFileSync("../assets/wy-logo.svg").toString().replace(/<g>[^]*?<\/g>/,"")}</div>
 <div id="render"></div>
@@ -915,5 +938,6 @@ var typeset = ${typeset.toString()};
 
 fs.writeFileSync("../site/index.html",html)
 
-fs.copyFileSync("../assets/font.ttf","../site/font.ttf")
-fs.copyFileSync("../assets/font.woff2","../site/font.woff2")
+// fs.copyFileSync("../assets/font.ttf","../site/font.ttf")
+// fs.copyFileSync("../assets/font.woff2","../site/font.woff2")
+fs.copyFileSync("../assets/qiji-combo.woff2","../site/qiji-combo.woff2")

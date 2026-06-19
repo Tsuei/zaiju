@@ -3,13 +3,17 @@
 ## 主题说明
 参考[《文言陰符》](https://book.wy-lang.org)
 ### 本地建构
-在`scipts/`中
+部署：在`site/`目录。
+
+更新：每次更改后在`scipts/`中
 ```
 node index.js
 ```
 更新`site/index.html`
 
+`fontchop.py`：生成子集版qiji体脚本，现已无用，因已用完整版qiji体
 
+`pdf.js`：生成pdf脚本
 
 <!--
 <img src="assets/wy-logo.svg" align="right" width="128" height="128"/>
