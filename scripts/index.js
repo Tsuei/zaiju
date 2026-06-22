@@ -6,6 +6,8 @@ QR1 = "」"
 
 PRD = "。"
 COM = "，";
+EMP = "、"
+
 RED = "#BB705AEE";
 BLACK = "#2B2B2B";
 BLUE = "#357";
@@ -125,7 +127,7 @@ function matrix(bl,sem,H){
 				}else{
 					T.push({t,s,x:x,y:y-w})
 				}
-			}else if (t == PRD || t == COM){
+			}else if (t == PRD || t == COM || t == EMP){ // 。，、
 				if (y == 0){
 					T.push({t,s,x:x+w,y:H-w})
 				}else{
@@ -201,10 +203,18 @@ function typeset(T,F,l,r,w,h){
 				O += `<div class="qr" style="top:${oy+h/2}px; left:${ox-d}px; width:${h/2+d}px; height:${h/2+d}px;">」</div>`
 			}else if (t == PRD){
 				O += `<div class="punc" style="top:${oy+h/2}px; left:${ox+h/2}px; font-size:${h*f*ff}px; ${(cstr.length)?cstr:"color:"+RED};">${t}</div>`
-			}else if (t == COM){
+			}else if (t == COM){ // 逗号顿号，未完工
     			O += `<div class="punc"
         		style="
-            		top:${oy+h/2}px;
+            		top:${oy}px;
+            		left:${ox+h/2}px;
+            		font-size:${h*f*ff}px;
+           			${(cstr.length)?cstr:"color:"+RED};
+        		">、</div>`
+			}else if (t == EMP){
+    			O += `<div class="punc"
+        		style="
+            		top:${oy}px;
             		left:${ox+h/2}px;
             		font-size:${h*f*ff}px;
            			${(cstr.length)?cstr:"color:"+RED};
@@ -589,7 +599,8 @@ var html = `
 <!--GENERATED FILE DO NOT EDIT-->
 <head>
   <meta charset="UTF-8">
-  <meta name="description" content="A book of poems">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A Book of Poems">
   <title>Zaiju Collection</title>
 </head>
 <script src="https://code.iconify.design/1/1.0.4/iconify.min.js"></script>
@@ -609,10 +620,11 @@ var html = `
 :root{
 	background:white;
 	overflow:hidden;
+    color-scheme: light dark; /* 可免疫Chrome强制自动夜间模式 */
 }
 body{
 	margin:0px;
-	background:#EFEFEF;
+	background: #E8D9B5; /* 主题颜色 #EFEFEF #EFE7D3 */
 	overflow: hidden;
 	overscroll-behavior-x: none; /* fix worst feature on Chrome */
 	overflow:hidden;
@@ -885,14 +897,14 @@ a:active{
 
 
 	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 122px)"></div>
-	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 94px)">秋</div>
-	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 66px)">水</div>
-	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 38px)">观</div>
+	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 94px); color: #000000">秋</div>
+	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 66px); color: #000000">水</div>
+	<div style="position:absolute; font-size:28px; left:37px; top:calc(100% - 38px); color: #000000">观</div>
 
 	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 122px)"></div>
-	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 94px)">齐</div>
-	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 66px)">拓</div>
-	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 38px)">撰</div>
+	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 94px); color: #000000">齐</div>
+	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 66px); color: #000000">拓</div>
+	<div style="position:absolute; font-size:28px; left:7px; top:calc(100% - 38px); color: #000000">撰</div>
 
 	<!--
 	${fs.readFileSync("../assets/exlibris.svg").toString().replace("<svg ",`<svg style="position:absolute;left:-9px;bottom:10px;height:80px;"`)}
