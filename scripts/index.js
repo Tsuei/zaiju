@@ -160,7 +160,7 @@ function matrix(bl,sem,H){
 			}else{
 				T.push({t,s,x,y})
 				y += w;
-				if (y >= H){
+				if (y >= H){ // H是一列允许的最大字数
 					y = ind;
 					x -= w;
 				}
@@ -280,7 +280,8 @@ function typeset(T,F,l,r,w,h){
 function main(){
 	var w = 60; // 36
 	var h = 42; // 28
-	var R = document.getElementById("render");
+	var render = document.getElementById("render");
+	var R = document.getElementById("paper"); // 旧版 var R = document.getElementById("render");
 	var S = document.getElementById("slider")
 	var M;
 
@@ -467,9 +468,9 @@ function main(){
 		l = r-window.innerWidth;
 		calcSlider();
 		var O = typeset(M.T,M.F,l,r,w,h);
-		R.innerHTML = `<div style="position:absolute;top:20px;">${O}</div>`;
+		R.innerHTML = `<div style="position:absolute;top:20px;">${O}</div>`; // 使能拖动
 		calcCover()
-		rewheel({deltaX:1,deltaY:1,preventDefault:_=>0})
+		// rewheel({deltaX:1,deltaY:1,preventDefault:_=>0}) // 意义不明
 	}
 	function slowSetR(_r){
 		for (var i = 0; i < 10; i++){
@@ -494,7 +495,8 @@ function main(){
 
 	function reflow(){
 		makeTOC();
-		H = Math.min(Math.max(window.innerHeight-200,h*15),h*50);
+		H = Math.min(Math.max(window.innerHeight-200,0),h*50); // 列字数
+		// H = Math.min(Math.max(window.innerHeight-200,h*15),h*50); // 原版
 
 		var n = Math.round((H-h-40)/h);
 		M = matrix(bl,sem,n);
@@ -527,6 +529,90 @@ function main(){
 
 	document.getElementById("render").addEventListener('wheel', rewheel)
 
+	// 手机端滚动
+	// ===== 正文横向拖动 =====
+	// ===== 手机拖动正文 =====
+	let touchX = 0;
+	let dragging = false;
+	render.addEventListener("touchstart", function(e){
+		dragging = true;
+		touchX = e.touches[0].clientX;
+	}, {passive:false}); // ture没用
+	document.addEventListener("touchmove", function(e){
+		console.log("move");
+		if (!dragging){
+			return;
+		}
+		const x = e.touches[0].clientX;
+		const dist = x - touchX;
+		// 灵敏度
+		setR(r - dist * 4);
+		touchX = x;
+		e.preventDefault();
+	}, {passive:false});
+	document.addEventListener("touchend", function(){
+		dragging = false;
+	}, {passive:false});
+	document.addEventListener("touchcancel", function(){
+		dragging = false;
+    	console.log("CANCEL");
+	}, {passive:false});
+	/*
+	let touchX = 0;
+	const render = document.getElementById("render");
+	render.addEventListener("touchstart", function(e){
+		// 记录手指按下时的位置
+		touchX = e.touches[0].clientX;
+	}, {passive:false});
+
+	let targetR = r;
+	let rendering = false;
+	render.addEventListener("touchmove", function(e){
+		// 当前手指位置
+		const x = e.touches[0].clientX;
+		// 本次移动距离（增量）
+		const dist = x - touchX;
+		// 更新阅读位置
+		// 如果方向反了，把减号改成加号即可
+		targetR -= dist*4;
+		// 更新参考点，使下一次移动继续从当前位置计算
+    	touchX = x;
+    	if (!rendering){ // 优化
+        	rendering = true;
+
+        	requestAnimationFrame(function(){
+            	setR(targetR);
+            	rendering = false;
+        	});
+    	}
+		// 阻止浏览器默认滑动行为
+		e.preventDefault();
+	}, {passive:false});
+
+	render.addEventListener("touchend", function(e){
+		// 不需要任何操作
+	}, {passive:false});
+	*/
+	// ===== 目录栏横向拖动 =====
+	const toc = document.getElementById("toc");
+	toc.addEventListener("touchstart", function(e){
+		touchX = e.touches[0].clientX;
+	}, {passive:false});
+	toc.addEventListener("touchmove", function(e){
+		const x = e.touches[0].clientX;
+		const dist = x - touchX;
+		rewheelTOC({
+			deltaX: -dist,
+			deltaY: 0,
+			preventDefault: _=>0
+		});
+		touchX = x;
+		e.preventDefault();
+	}, {passive:false});
+	toc.addEventListener("touchend", function(e){
+		// 不需要任何操作
+	}, {passive:false});
+	/* // 原版
 	var touchX;
     document.getElementById("render").addEventListener('touchstart', function(e){
         touchX = e.changedTouches[0].clientX
@@ -551,6 +637,7 @@ function main(){
     }, false)
     document.getElementById("toc").addEventListener('touchend', function(e){
     }, false)
+	*/
 
 	function makeTOC(){
 		document.getElementById("toc-inner").innerHTML = "";
@@ -617,6 +704,24 @@ var html = `
 	src: url('https://cdn.jsdelivr.net/gh/wenyan-lang/book@3899aad7a917d0f000716ca97fe29221fe4b56d6/assets/font.woff2') format('woff2'), url('https://cdn.jsdelivr.net/gh/wenyan-lang/book@3899aad7a917d0f000716ca97fe29221fe4b56d6/assets/font.ttf') format('truetype');
 }
 */
+/*
+@media (max-width:768px){
+
+    #title{
+        display:none;
+    }
+
+    #toc{
+        display:none;
+    }
+
+    #render{
+        top:0;
+        height:100dvh;
+    }
+
+}
+*/ /* 以上手机版（未完成） */
 :root{
 	background:white;
 	overflow:hidden;
@@ -641,11 +746,15 @@ body{
 	font-family: QIJI;
 	line-height: 45px;
 	/* border-left: 1px solid ${RED}; */
+	pointer-events: none; /* 有用但复制失效*/
 }
 .punc{
 	position:absolute;
 	font-family: QIJI;
 	z-index: 200;
+	/* user-select:none; 没用 */
+    /* touch-action: none; 没用 */
+	pointer-events: none; /* 有用但复制失效*/
 }
 .ql{
 	position:absolute;
@@ -653,6 +762,7 @@ body{
 	border-right: 2px solid ${RED};
 	transform: translate(-2px,5px);
 	color:rgba(0,0,0,0);
+	pointer-events: none; /* 有用但复制失效*/
 }
 .qr{
 	position:absolute;
@@ -660,6 +770,7 @@ body{
 	border-left: 2px solid ${RED};
 	transform: translate(2px,4.5px);
 	color:rgba(0,0,0,0);
+	pointer-events: none; /* 有用但复制失效*/
 }
 .box{
 	position:absolute;
@@ -700,7 +811,7 @@ body{
 	width:100%;
 	border-top: 1px solid lightgrey;
 	border-bottom: 1px solid lightgrey;
-	overflow:hidden;
+	overflow:hidden; /* 最下端拖动条，没用 */
 }
 #slider{
 	position:absolute;
@@ -879,7 +990,9 @@ a:active{
 <!--
 <div style="position:absolute;left:20px;top:15px;opacity:0.5">${fs.readFileSync("../assets/wy-logo.svg").toString().replace(/<g>[^]*?<\/g>/,"")}</div>
 -->
-<div id="render"></div>
+<div id="render">
+    <div id="paper"></div> <!-- 定义在上面，没用 -->
+</div>
 <div id="cover">
 	<!--
 	<div style="position:absolute;left:72px;width:calc(100% - 144px);top:0px;height:100%;border-left:2px solid ${BLACK};border-right:2px solid ${BLACK}">
