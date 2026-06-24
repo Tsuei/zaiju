@@ -278,8 +278,12 @@ function typeset(T,F,l,r,w,h){
 
 
 function main(){
-	var w = 60; // 36
-	var h = 42; // 28
+	var w = 54; // 36
+	var h = 38; // 28
+	if (window.innerWidth < 700){ // 手机版
+		w = 34;
+    	h = 26;
+	}
 	var render = document.getElementById("render");
 	var R = document.getElementById("paper"); // 旧版 var R = document.getElementById("render");
 	var S = document.getElementById("slider")
@@ -349,7 +353,11 @@ function main(){
 		}
 
 		var _h = (_ra.offsetHeight-2);
-		var _t = 174; // cover元素的top值，_t px，原204
+		
+		if (window.innerWidth < 700){ // 手机版
+			var _t = 124;
+		}else
+			var _t = 174; // cover元素的top值，_t px，原204，计算方式为render的top+24
 
 		var cov = document.getElementById("cover");
 		cov.style.position = "absolute"
@@ -428,9 +436,22 @@ function main(){
 		`
 		var i = getCurrChap();
 
+		function num2zh(n){
+			const a = ["","一","二","三","四","五","六","七","八","九"];
+			if (n < 10) return a[n];
+			if (n == 10) return "十";
+			if (n < 20) return "十" + a[n%10];
+			if (n % 10 == 0) return a[Math.floor(n/10)] + "十";
+			return a[Math.floor(n/10)] + "十" + a[n%10];
+		}
+
 		if (i != -1){
-			var t = fnames[i].split(" ")[1].split(".")[0];
-			var s = "在莒集卷之"+t.split("第")[1];
+			var p = fnames[i].split(" ");
+			var n = parseInt(p[0]);
+			var t = p.slice(1).join(" ").split(".")[0];
+			var s = "在莒集卷之" + num2zh(n);
+			// var t = fnames[i].split(" ")[1].split(".")[0];
+			// var s = "在莒集卷之"+t.split("第")[1];
 			for (var j = 0; j < s.length; j++){
 				o += `<div style="position:absolute; font-size:20px; left:1px; top:${60+j*20}px">${s[j]}</div>`
 			}
@@ -470,7 +491,7 @@ function main(){
 		var O = typeset(M.T,M.F,l,r,w,h);
 		R.innerHTML = `<div style="position:absolute;top:20px;">${O}</div>`; // 使能拖动
 		calcCover()
-		// rewheel({deltaX:1,deltaY:1,preventDefault:_=>0}) // 意义不明
+		rewheel({deltaX:1,deltaY:1,preventDefault:_=>0}) // 如果没有这行，拖动会超出左右边缘，为手机端定制的h也不会变
 	}
 	function slowSetR(_r){
 		for (var i = 0; i < 10; i++){
@@ -495,8 +516,11 @@ function main(){
 
 	function reflow(){
 		makeTOC();
-		H = Math.min(Math.max(window.innerHeight-200,0),h*50); // 列字数
-		// H = Math.min(Math.max(window.innerHeight-200,h*15),h*50); // 原版
+		if (window.innerWidth < 700){ // 手机版
+			H = Math.min(Math.max(window.innerHeight-100,0),h*50); // 列字数
+		}else
+			H = Math.min(Math.max(window.innerHeight-170,0),h*50); // 列字数
+		// H = Math.min(Math.max(window.innerHeight-200,h*15),h*50); // 原版，200是文字到灰线的距离，CSS里render的bottom也是200是灰线到下边的距离
 
 		var n = Math.round((H-h-40)/h);
 		M = matrix(bl,sem,n);
@@ -641,10 +665,11 @@ function main(){
 
 	function makeTOC(){
 		document.getElementById("toc-inner").innerHTML = "";
+		var tocw = window.innerWidth < 700 ? 110 : 180; // 手机端，对应CSS tocitem
 		for (var i = 0; i < fnames.length; i++){
 			var ti = document.createElement("div");
 			ti.classList.add("tocitem")
-			ti.style.left = (document.getElementById("toc").offsetWidth-180-i*180)+"px";
+			ti.style.left = (document.getElementById("toc").offsetWidth - tocw - i*tocw) + "px"; // (document.getElementById("toc").offsetWidth-180-i*180)+"px";
 			var t = fnames[i].split(" ")[1].split(".")[0].split("").reverse().join("");
 			if (t.length > 4){
 				t = t.replace("第","")
@@ -813,6 +838,12 @@ body{
 	border-bottom: 1px solid lightgrey;
 	overflow:hidden; /* 最下端拖动条，没用 */
 }
+@media (max-width:700px){
+    #render{
+		top:100px;
+		height:100%;
+    }
+}
 #slider{
 	position:absolute;
 	background: #BBB;
@@ -872,11 +903,11 @@ body{
 	opacity:0.05;
 	z-index: -1;
 }
-#bar{
-	background:#EFEFEF;
+#bar{ /* 侧边栏颜色 */
+	background: #E8D9B5 /* #EFEFEF; */
 }
 #bar:hover{
-	background:#E7E7E7;
+	background: #ddceac /* #E7E7E7; */
 }
 #toc{
 	position:absolute;
@@ -901,6 +932,18 @@ body{
 	cursor:pointer;
 	top:20px;
 }
+@media (max-width:700px){ /* 手机端目录栏 */
+    #toc{
+        top:40px;
+        height:60px;
+    }
+    .tocitem{
+        width:100px;
+        height:36px;
+        font-size:20px;
+        top:10px;
+    }
+}
 .tocitem-curr{
 	color: dimgrey;
 	border: 1px solid dimgrey;
@@ -921,6 +964,19 @@ body{
 	text-align:right;
 	font-size:12px;
 	top:5px;
+}
+@media (max-width:700px){
+    #title{
+		font-size:9px;     /* 字号变小 */
+		right:5px;         /* 更靠右 */
+		top:0px;           /* 顶格 */
+		padding:2px;       /* 减少内边距 */
+		width:220px;       /* 防止占太宽 */
+    }
+    #title h1{
+        font-size:12px;
+        margin:0;
+    }
 }
 h1{
 	font-weight: normal;
