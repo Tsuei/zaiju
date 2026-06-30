@@ -133,6 +133,11 @@ function matrix(bl,sem,H){
 				}else{
 					T.push({t,s,x:x,y:y-w})
 				}
+				// 标点画完以后，如果上一字已经超出列底，再换列
+				if (y >= H){
+    				y = ind;
+    				x -= w;
+				}
 			}else if (t == "\n"){
 				if (y != 0){
 					x -= w;
@@ -160,7 +165,11 @@ function matrix(bl,sem,H){
 			}else{
 				T.push({t,s,x,y})
 				y += w;
-				if (y >= H){ // H是一列允许的最大字数
+				// 如果已经到列底，但下一字符是不占格标点，就先别换列
+				var next = bl[i][j+1];
+				if (y >= H && // H是一列允许的最大字数
+    				!(next == PRD || next == COM || next == EMP)
+				){
 					y = ind;
 					x -= w;
 				}
@@ -278,25 +287,51 @@ function typeset(T,F,l,r,w,h){
 
 
 function main(){
-	var w = 54; // 36
-	var h = 38; // 28
+	// 字号
+	var w = 40; // 36
+	var h = 32; // 28
 	if (window.innerWidth < 700){ // 手机版
-		w = 34;
-    	h = 26;
+		w = 30;
+    	h = 22;
 	}
 	var render = document.getElementById("render");
 	var R = document.getElementById("paper"); // 旧版 var R = document.getElementById("render");
 	var S = document.getElementById("slider")
 	var M;
 
-	dragElement(S);
+	dragElement(S); // 该函数解决slider拖动事件，原版只支持鼠标
 	function dragElement(elmnt) {
-	  var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-	  if (document.getElementById(elmnt.id + "header")) {
-	    document.getElementById(elmnt.id + "header").onmousedown = dragMouseDown;
-	  } else {
-	    elmnt.onmousedown = dragMouseDown;
-	  }
+	    // var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0; // 以下呼应review()的正确版本不需要
+	    if (document.getElementById(elmnt.id + "header")) {
+	        document.getElementById(elmnt.id + "header").onpointerdown = dragPointerDown; // .onmousedown = dragMouseDown;
+	    } else {
+	        elmnt.onpointerdown = dragPointerDown; // .onmousedown = dragMouseDown;
+	    }
+		function dragPointerDown(e) {
+			e.preventDefault();
+   			dragOffset = e.clientX - elmnt.getBoundingClientRect().left;
+			document.onpointermove = elementDrag;
+			document.onpointerup = closeDragElement;
+			document.onpointercancel = closeDragElement;
+		}
+		function elementDrag(e) {
+			e.preventDefault();
+			let left = e.clientX - dragOffset;
+			left = Math.max(
+				0,
+				Math.min(left, window.innerWidth - elmnt.offsetWidth)
+			);
+			elmnt.style.right =
+				(window.innerWidth - left - elmnt.offsetWidth) + "px";
+
+			review();
+		}
+		function closeDragElement() {
+			document.onpointermove = null;
+			document.onpointerup = null;
+			document.onpointercancel = null;
+		}
+	  /*
 	  function dragMouseDown(e) {
 	    e = e || window.event;
 	    e.preventDefault();
@@ -319,7 +354,7 @@ function main(){
 	  function closeDragElement() {
 	    document.onmouseup = null;
 	    document.onmousemove = null;
-	  }
+	  }*/
 	}
 
 	var l = -window.innerWidth;
@@ -357,7 +392,7 @@ function main(){
 		if (window.innerWidth < 700){ // 手机版
 			var _t = 124;
 		}else
-			var _t = 174; // cover元素的top值，_t px，原204，计算方式为render的top+24
+			var _t = 174; // 封面（cover元素）的top值，_t px，原204，计算方式为render的top+24
 
 		var cov = document.getElementById("cover");
 		cov.style.position = "absolute"
@@ -520,7 +555,9 @@ function main(){
 			H = Math.min(Math.max(window.innerHeight-100,0),h*50); // 列字数
 		}else
 			H = Math.min(Math.max(window.innerHeight-170,0),h*50); // 列字数
-		// H = Math.min(Math.max(window.innerHeight-200,h*15),h*50); // 原版，200是文字到灰线的距离，CSS里render的bottom也是200是灰线到下边的距离
+		// 原版，减数200是黑线到下边的距离，CSS中render里height的减数是灰线到下边的距离，也是200
+		// 注意黑线到下边距离并不是连续的而是离散的，这是因为排字，过了一个字的长度才会换
+		// H = Math.min(Math.max(window.innerHeight-200,h*15),h*50);
 
 		var n = Math.round((H-h-40)/h);
 		M = matrix(bl,sem,n);
@@ -569,8 +606,8 @@ function main(){
 		}
 		const x = e.touches[0].clientX;
 		const dist = x - touchX;
-		// 灵敏度
-		setR(r - dist * 4);
+		// 灵敏度为dist系数，大了掉帧
+		setR(r - dist); // * 4
 		touchX = x;
 		e.preventDefault();
 	}, {passive:false});
@@ -729,24 +766,7 @@ var html = `
 	src: url('https://cdn.jsdelivr.net/gh/wenyan-lang/book@3899aad7a917d0f000716ca97fe29221fe4b56d6/assets/font.woff2') format('woff2'), url('https://cdn.jsdelivr.net/gh/wenyan-lang/book@3899aad7a917d0f000716ca97fe29221fe4b56d6/assets/font.ttf') format('truetype');
 }
 */
-/*
-@media (max-width:768px){
 
-    #title{
-        display:none;
-    }
-
-    #toc{
-        display:none;
-    }
-
-    #render{
-        top:0;
-        height:100dvh;
-    }
-
-}
-*/ /* 以上手机版（未完成） */
 :root{
 	background:white;
 	overflow:hidden;
@@ -771,7 +791,7 @@ body{
 	font-family: QIJI;
 	line-height: 45px;
 	/* border-left: 1px solid ${RED}; */
-	pointer-events: none; /* 有用但复制失效*/
+	/* pointer-events: none; 解决移动端异常拖动的问题，但复制失效 */
 }
 .punc{
 	position:absolute;
@@ -779,7 +799,7 @@ body{
 	z-index: 200;
 	/* user-select:none; 没用 */
     /* touch-action: none; 没用 */
-	pointer-events: none; /* 有用但复制失效*/
+	/* pointer-events: none; 解决移动端异常拖动的问题，但复制失效 */
 }
 .ql{
 	position:absolute;
@@ -787,7 +807,7 @@ body{
 	border-right: 2px solid ${RED};
 	transform: translate(-2px,5px);
 	color:rgba(0,0,0,0);
-	pointer-events: none; /* 有用但复制失效*/
+	/* pointer-events: none; 解决移动端异常拖动的问题，但复制失效 */
 }
 .qr{
 	position:absolute;
@@ -795,7 +815,12 @@ body{
 	border-left: 2px solid ${RED};
 	transform: translate(2px,4.5px);
 	color:rgba(0,0,0,0);
-	pointer-events: none; /* 有用但复制失效*/
+	/* pointer-events: none; 解决移动端异常拖动的问题，但复制失效 */
+}
+@media (max-width:700px){
+    .text, .punc, .ql, .qr{
+		pointer-events: none; /* 解决移动端异常拖动的问题，而不影响电脑端复制选中 */
+    }
 }
 .box{
 	position:absolute;
@@ -830,18 +855,18 @@ body{
 
 #render{
 	position:absolute;
-	top:150px; /* 正文上边距，原为180px */
+	top:150px; /* 正文/上灰线的上边距，原为180px 要动这个需要同时动cover对齐 */
 	left:0px;
-	height:calc(100% - 200px);
+	height:calc(100% - 200px); /* 减数为下灰线到下边的距离 */
 	width:100%;
 	border-top: 1px solid lightgrey;
 	border-bottom: 1px solid lightgrey;
-	overflow:hidden; /* 最下端拖动条，没用 */
+	overflow:hidden; /* 假的最下端拖动条，没用 */
 }
 @media (max-width:700px){
     #render{
-		top:100px;
-		height:100%;
+		top:100px; /* 上灰线到上边距离 */
+		height:calc(100% - 119px); /* 减数大于110，下灰线才会出现，用119能使之与slider合契 */
     }
 }
 #slider{
@@ -850,6 +875,7 @@ body{
 	height:20px;
 	top:calc(100% - 18px);
 	cursor:ew-resize;
+    touch-action: none; /* 为滑动条解决与拖动正文时同种问题 */
 }
 #editor-wrap{
 	position:absolute;
