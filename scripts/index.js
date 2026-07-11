@@ -510,7 +510,8 @@ function main(){
 			if (tis[i].offsetLeft+tin.offsetLeft < 10){
 				tin.style.left = (-tis[i].offsetLeft+10)+"px";
 			}
-			var tr = document.getElementById("toc").offsetWidth-180;
+			var tocw = window.innerWidth < 700 ? 110 : 180; // 手机版110，否则移动过头
+			var tr = document.getElementById("toc").offsetWidth - tocw;
 			if (tis[i].offsetLeft+tin.offsetLeft > tr){
 				tin.style.left = -(tis[i].offsetLeft-tr)+"px";
 			}
@@ -702,7 +703,7 @@ function main(){
 
 	function makeTOC(){
 		document.getElementById("toc-inner").innerHTML = "";
-		var tocw = window.innerWidth < 700 ? 110 : 180; // 手机端，对应CSS tocitem
+		var tocw = window.innerWidth < 700 ? 110 : 180; // 手机端110px，对应CSS tocitem 100px，差值10是间宽
 		for (var i = 0; i < fnames.length; i++){
 			var ti = document.createElement("div");
 			ti.classList.add("tocitem")
@@ -747,11 +748,29 @@ var tw = 40;
 var html = `
 <!--GENERATED FILE DO NOT EDIT-->
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="A Book of Poems">
-  <title>Zaiju Collection</title>
+	<script>
+	(function () {
+		try {
+		if (localStorage.getItem('darkMode') === '1') {
+			document.documentElement.style.filter = 'invert(95%)';
+			// 等按钮渲染完再改文字
+			document.addEventListener('DOMContentLoaded', function () {
+			var b = document.getElementById('darkModeBtn');
+			if (b) b.innerHTML = '[light]';
+			});
+		}
+		} catch (e) { /* localStorage 不可用时静默 */ }
+	})();
+	</script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="A Book of Poems">
+	<title>Zaiju Collection</title>
+	<!-- <script>
+	document.documentElement.style.filter = "invert(95%)";  默认夜间模式 
+	</script> -->
 </head>
+
 <script src="https://code.iconify.design/1/1.0.4/iconify.min.js"></script>
 <style id="style">
 @font-face {
@@ -789,7 +808,8 @@ body{
 	position:absolute;
 	color: ${BLACK};
 	font-family: QIJI;
-	line-height: 45px;
+	line-height: 100%; /* 行框等于字号 */
+	transform: translateY( 4px ); /* 字相对于行框向下偏移多少 */
 	/* border-left: 1px solid ${RED}; */
 	/* pointer-events: none; 解决移动端异常拖动的问题，但复制失效 */
 }
@@ -820,7 +840,10 @@ body{
 @media (max-width:700px){
     .text, .punc, .ql, .qr{
 		pointer-events: none; /* 解决移动端异常拖动的问题，而不影响电脑端复制选中 */
-    }
+    }/*
+	.punc, .ql, .qr{
+    	transform: translateY(2px);
+    }*/
 }
 .box{
 	position:absolute;
@@ -964,7 +987,7 @@ body{
         height:60px;
     }
     .tocitem{
-        width:100px;
+        width:100px; /* 对应makeTOC里的110px，差值10是间宽 */
         height:36px;
         font-size:20px;
         top:10px;
@@ -1064,7 +1087,22 @@ a:active{
 <a href="https://github.com/wenyan-lang/book/releases">pdf</a> | <a href="https://github.com/wenyan-lang/book">github</a> | <a href="https://wy-lang.org/">wenyan-lang</a> | <a href="https://github.com/wenyan-lang/wenyan/wiki">wiki</a> | <a href="https://lingdong.works/">lingdong</a>
 <br>
 -->
-<span class="text-btn" onclick="document.documentElement.style.filter=document.documentElement.style.filter.length?'':'invert(95%)';this.innerHTML={'[light]':'[dark]','[dark]':'[light]'}[this.innerHTML]">[dark]</span>
+<span id="darkModeBtn" class="text-btn" onclick="toggleDarkMode(this)">[dark]</span>
+<script>
+  function toggleDarkMode(btn) {
+    var html = document.documentElement;
+    var isDark = html.style.filter.length > 0;
+    if (isDark) {
+      html.style.filter = '';
+      localStorage.setItem('darkMode', '0');
+      btn.innerHTML = '[dark]';
+    } else {
+      html.style.filter = 'invert(95%)';
+      localStorage.setItem('darkMode', '1');
+      btn.innerHTML = '[light]';
+    }
+  }
+</script>
 <!--
 <span class="text-btn" onclick="document.getElementById('help').style.display={'block':'none','none':'block'}[document.getElementById('help').style.display];">[help]</span>
 -->
