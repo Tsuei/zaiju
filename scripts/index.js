@@ -145,9 +145,9 @@ function matrix(bl,sem,H){
 					w = 1
 				}
 				ind = 0;
-			}else if (t == "〇"){ // 以下〇 > /是自己改的主题，分别为缩进2、3、4字距块
-				ind = 2;
-				y += w*2;
+			}else if (t == "〇"){ // 以下〇 > /是自己改的主题，分别为缩进3、4、5字距块
+				ind = 3;
+				y += w*3;
 			}else if (t == "#"){
 				// w = 2;
 				A.push(x)
@@ -157,11 +157,11 @@ function matrix(bl,sem,H){
 				T.push({t:"一",s,x,y})
 				y += w*2;
 			}else if (t == ">"){
-				ind = 3;
-				y += w*3;
-			}else if (t == "/"){
 				ind = 4;
 				y += w*4;
+			}else if (t == "/"){
+				ind = 5;
+				y += w*5;
 			}else{
 				T.push({t,s,x,y})
 				y += w;
