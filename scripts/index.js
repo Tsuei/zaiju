@@ -291,8 +291,8 @@ function main(){
 	var w = 40; // 36
 	var h = 32; // 28
 	if (window.innerWidth < 700){ // 手机版
-		w = 30;
-    	h = 22;
+		w = 25;
+    	h = 19;
 	}
 	var render = document.getElementById("render");
 	var R = document.getElementById("paper"); // 旧版 var R = document.getElementById("render");
